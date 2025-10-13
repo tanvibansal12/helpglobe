@@ -28,12 +28,19 @@ export default function Home() {
       setLoading(true);
       setError(null);
       
-      const response = await fetch('/api/events');
+      const response = await fetch('/api/events', {
+        cache: 'no-store', // Always fetch fresh data
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      });
+      
       if (!response.ok) {
-        throw new Error('Failed to fetch events');
+        throw new Error(`Failed to fetch events: ${response.status}`);
       }
       
       const data = await response.json();
+      console.log('Fetched events:', data.length);
       setEvents(data);
       setLastUpdated(new Date());
     } catch (err) {

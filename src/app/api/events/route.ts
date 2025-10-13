@@ -14,9 +14,9 @@ interface Event {
 
 export async function GET() {
   try {
-    // Fetch data from all three APIs in parallel
-    const [reliefWebResponse, earthquakesResponse, gdeltResponse] = await Promise.all([
-      fetch('https://api.reliefweb.int/v1/disasters?limit=30&sort[]=date:desc', {
+    // Fetch data from all three APIs in parallel with better error handling
+    const [reliefWebResponse, earthquakesResponse, gdeltResponse] = await Promise.allSettled([
+      fetch('https://api.reliefweb.int/v1/disasters?limit=50&sort[]=date:desc&filter[field]=date&filter[value][from]=2024-01-01', {
         headers: {
           'Accept': 'application/json',
           'User-Agent': 'HelpGlobe/1.0'
@@ -28,7 +28,7 @@ export async function GET() {
           'User-Agent': 'HelpGlobe/1.0'
         }
       }),
-      fetch('https://api.gdeltproject.org/api/v2/doc/doc?query=*&mode=artlist&maxrecords=30&format=json&sort=date', {
+      fetch('https://api.gdeltproject.org/api/v2/doc/doc?query=disaster OR earthquake OR conflict OR protest OR health&mode=artlist&maxrecords=50&format=json&sort=date', {
         headers: {
           'Accept': 'application/json',
           'User-Agent': 'HelpGlobe/1.0'
@@ -41,8 +41,8 @@ export async function GET() {
     let gdeltData: Event[] = [];
 
     // Process ReliefWeb data
-    if (reliefWebResponse.ok) {
-      const reliefWebJson = await reliefWebResponse.json();
+    if (reliefWebResponse.status === 'fulfilled' && reliefWebResponse.value.ok) {
+      const reliefWebJson = await reliefWebResponse.value.json();
       reliefWebData = reliefWebJson.data.map((item: any) => {
         const disaster = item.fields;
         
@@ -76,8 +76,8 @@ export async function GET() {
     }
 
     // Process USGS earthquake data
-    if (earthquakesResponse.ok) {
-      const earthquakesJson = await earthquakesResponse.json();
+    if (earthquakesResponse.status === 'fulfilled' && earthquakesResponse.value.ok) {
+      const earthquakesJson = await earthquakesResponse.value.json();
       earthquakesData = earthquakesJson.features.map((feature: any) => {
         const props = feature.properties;
         const coords = feature.geometry.coordinates;
@@ -114,8 +114,8 @@ export async function GET() {
     }
 
     // Process GDELT data
-    if (gdeltResponse.ok) {
-      const gdeltJson = await gdeltResponse.json();
+    if (gdeltResponse.status === 'fulfilled' && gdeltResponse.value.ok) {
+      const gdeltJson = await gdeltResponse.value.json();
       gdeltData = gdeltJson.articles?.map((article: any) => {
         let lat = 0;
         let lon = 0;
@@ -161,8 +161,66 @@ export async function GET() {
     }
 
     // Combine and sort by date
-    const allEvents: Event[] = [...reliefWebData, ...earthquakesData, ...gdeltData]
+    let allEvents: Event[] = [...reliefWebData, ...earthquakesData, ...gdeltData]
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    // Add some demo data if we don't have enough real data
+    if (allEvents.length < 5) {
+      const demoEvents: Event[] = [
+        {
+          title: "Major Earthquake in Japan",
+          lat: 35.6762,
+          lon: 139.6503,
+          summary: "Magnitude 7.2 earthquake strikes near Tokyo, causing significant damage and triggering tsunami warnings.",
+          url: "https://example.com",
+          type: "earthquake",
+          date: new Date().toISOString(),
+          magnitude: 7.2,
+          source: "Demo"
+        },
+        {
+          title: "Flooding in Bangladesh",
+          lat: 23.6850,
+          lon: 90.3563,
+          summary: "Severe flooding affects millions in Bangladesh, with thousands displaced and in need of emergency assistance.",
+          url: "https://example.com",
+          type: "disaster",
+          date: new Date(Date.now() - 3600000).toISOString(),
+          source: "Demo"
+        },
+        {
+          title: "Conflict in Ukraine",
+          lat: 50.4501,
+          lon: 30.5234,
+          summary: "Ongoing conflict situation requiring humanitarian aid and medical assistance.",
+          url: "https://example.com",
+          type: "conflict",
+          date: new Date(Date.now() - 7200000).toISOString(),
+          source: "Demo"
+        },
+        {
+          title: "Health Emergency in Africa",
+          lat: -1.2921,
+          lon: 36.8219,
+          summary: "Health crisis requiring immediate medical assistance and supplies.",
+          url: "https://example.com",
+          type: "health",
+          date: new Date(Date.now() - 10800000).toISOString(),
+          source: "Demo"
+        },
+        {
+          title: "Protest in France",
+          lat: 48.8566,
+          lon: 2.3522,
+          summary: "Large-scale protests in Paris requiring monitoring and potential assistance.",
+          url: "https://example.com",
+          type: "protest",
+          date: new Date(Date.now() - 14400000).toISOString(),
+          source: "Demo"
+        }
+      ];
+      allEvents = [...allEvents, ...demoEvents];
+    }
 
     return NextResponse.json(allEvents);
   } catch (error) {
