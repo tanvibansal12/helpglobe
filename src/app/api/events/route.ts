@@ -72,6 +72,174 @@ export async function GET() {
       console.log('USGS API failed:', error);
     }
 
+    // Try to fetch ReliefWeb disaster data
+    try {
+      console.log('Fetching ReliefWeb disaster data...');
+      const reliefWebResponse = await fetch('https://api.reliefweb.int/v1/disasters?limit=20&sort[]=date:desc&filter[field]=date&filter[value][from]=2024-01-01', {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'HelpGlobe/1.0'
+        }
+      });
+      
+      if (reliefWebResponse.ok) {
+        const reliefWebJson = await reliefWebResponse.json();
+        const reliefWebData = reliefWebJson.data.map((item: any) => {
+          const disaster = item.fields;
+          
+          let lat = 0;
+          let lon = 0;
+          
+          if (disaster.country && disaster.country.length > 0) {
+            const country = disaster.country[0];
+            if (country.location && country.location.length > 0) {
+              lat = country.location[0].lat;
+              lon = country.location[0].lon;
+            }
+          }
+
+          let summary = 'Disaster event reported';
+          if (disaster.description && disaster.description.length > 0) {
+            summary = disaster.description[0].substring(0, 200) + '...';
+          }
+
+          return {
+            title: disaster.name || 'Disaster Event',
+            lat,
+            lon,
+            summary,
+            url: `https://reliefweb.int/disaster/${disaster.id}`,
+            type: 'disaster',
+            date: disaster.date?.created || new Date().toISOString(),
+            source: 'ReliefWeb'
+          };
+        }).filter((event: Event) => event.lat !== 0 && event.lon !== 0);
+        
+        allEvents = [...allEvents, ...reliefWebData];
+        console.log(`Added ${reliefWebData.length} disaster events`);
+      }
+    } catch (error) {
+      console.log('ReliefWeb API failed:', error);
+    }
+
+    // Try to fetch GDELT news data for conflicts and protests
+    try {
+      console.log('Fetching GDELT news data...');
+      const gdeltResponse = await fetch('https://api.gdeltproject.org/api/v2/doc/doc?query=conflict OR protest OR health emergency OR disaster&mode=artlist&maxrecords=20&format=json&sort=date', {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'HelpGlobe/1.0'
+        }
+      });
+      
+      if (gdeltResponse.ok) {
+        const gdeltJson = await gdeltResponse.json();
+        const gdeltData = gdeltJson.articles?.map((article: any) => {
+          // Use a simple geocoding approach for demo purposes
+          // In production, you'd use a proper geocoding service
+          const title = article.title?.toLowerCase() || '';
+          const snippet = article.snippet?.toLowerCase() || '';
+          
+          // Simple location mapping based on keywords
+          let lat = 0;
+          let lon = 0;
+          let eventType = 'news';
+          
+          if (title.includes('ukraine') || snippet.includes('ukraine')) {
+            lat = 50.4501; lon = 30.5234; eventType = 'conflict';
+          } else if (title.includes('gaza') || snippet.includes('gaza')) {
+            lat = 31.3547; lon = 34.3088; eventType = 'conflict';
+          } else if (title.includes('syria') || snippet.includes('syria')) {
+            lat = 33.5138; lon = 36.2765; eventType = 'conflict';
+          } else if (title.includes('afghanistan') || snippet.includes('afghanistan')) {
+            lat = 33.9391; lon = 67.7100; eventType = 'conflict';
+          } else if (title.includes('protest') || snippet.includes('protest')) {
+            lat = 40.7128; lon = -74.0060; eventType = 'protest'; // Default to NYC
+          } else if (title.includes('health') || snippet.includes('health')) {
+            lat = -1.2921; lon = 36.8219; eventType = 'health'; // Default to Kenya
+          } else if (title.includes('flood') || snippet.includes('flood')) {
+            lat = 23.6850; lon = 90.3563; eventType = 'disaster'; // Bangladesh
+          } else {
+            // Skip this article if no clear location
+            return null;
+          }
+
+          return {
+            title: article.title || 'Global News Event',
+            lat,
+            lon,
+            summary: article.snippet || 'News event reported',
+            url: article.url || '#',
+            type: eventType,
+            date: article.seendate || new Date().toISOString(),
+            source: 'GDELT'
+          };
+        }).filter((event: Event | null) => event !== null) || [];
+        
+        allEvents = [...allEvents, ...gdeltData];
+        console.log(`Added ${gdeltData.length} news events`);
+      }
+    } catch (error) {
+      console.log('GDELT API failed:', error);
+    }
+
+    // Try to fetch additional news data from a more reliable source
+    try {
+      console.log('Fetching additional news data...');
+      // Using a free news API (you can replace with your preferred news source)
+      const newsResponse = await fetch('https://newsapi.org/v2/everything?q=disaster OR conflict OR protest OR health emergency&sortBy=publishedAt&pageSize=10&apiKey=demo', {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'HelpGlobe/1.0'
+        }
+      });
+      
+      if (newsResponse.ok) {
+        const newsJson = await newsResponse.json();
+        const newsData = newsJson.articles?.map((article: any) => {
+          const title = article.title?.toLowerCase() || '';
+          const description = article.description?.toLowerCase() || '';
+          
+          // Simple location and type detection
+          let lat = 0;
+          let lon = 0;
+          let eventType = 'news';
+          
+          if (title.includes('ukraine') || description.includes('ukraine')) {
+            lat = 50.4501; lon = 30.5234; eventType = 'conflict';
+          } else if (title.includes('gaza') || description.includes('gaza')) {
+            lat = 31.3547; lon = 34.3088; eventType = 'conflict';
+          } else if (title.includes('earthquake') || description.includes('earthquake')) {
+            lat = 35.6762; lon = 139.6503; eventType = 'earthquake';
+          } else if (title.includes('flood') || description.includes('flood')) {
+            lat = 23.6850; lon = 90.3563; eventType = 'disaster';
+          } else if (title.includes('protest') || description.includes('protest')) {
+            lat = 40.7128; lon = -74.0060; eventType = 'protest';
+          } else if (title.includes('health') || description.includes('health')) {
+            lat = -1.2921; lon = 36.8219; eventType = 'health';
+          } else {
+            return null; // Skip if no clear location/type
+          }
+
+          return {
+            title: article.title || 'News Event',
+            lat,
+            lon,
+            summary: article.description || 'News event reported',
+            url: article.url || '#',
+            type: eventType,
+            date: article.publishedAt || new Date().toISOString(),
+            source: 'NewsAPI'
+          };
+        }).filter((event: Event | null) => event !== null) || [];
+        
+        allEvents = [...allEvents, ...newsData];
+        console.log(`Added ${newsData.length} news events`);
+      }
+    } catch (error) {
+      console.log('News API failed:', error);
+    }
+
     // Always add demo data to ensure we have markers
     const demoEvents: Event[] = [
       {
