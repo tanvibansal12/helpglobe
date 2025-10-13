@@ -1,0 +1,94 @@
+{
+  "organizations": [
+    {
+      "name": "Red Cross",
+      "url": "https://www.redcross.org/",
+      "description": "International humanitarian organization providing emergency assistance",
+      "phone": "+1-800-RED-CROSS",
+      "regions": ["global"],
+      "focus": ["disaster relief", "emergency response", "healthcare"],
+      "verified": true
+    },
+    {
+      "name": "Doctors Without Borders",
+      "url": "https://www.doctorswithoutborders.org/",
+      "description": "Medical humanitarian organization providing healthcare in crisis zones",
+      "phone": "+1-888-392-0392",
+      "regions": ["global"],
+      "focus": ["healthcare", "medical aid", "crisis response"],
+      "verified": true
+    },
+    {
+      "name": "UNICEF",
+      "url": "https://www.unicef.org/",
+      "description": "United Nations agency focused on children's rights and welfare",
+      "phone": "+1-800-367-5437",
+      "regions": ["global"],
+      "focus": ["children", "education", "healthcare", "emergency response"],
+      "verified": true
+    },
+    {
+      "name": "World Food Programme",
+      "url": "https://www.wfp.org/",
+      "description": "UN agency fighting hunger worldwide through food assistance",
+      "phone": "+39-06-65131",
+      "regions": ["global"],
+      "focus": ["food security", "nutrition", "emergency food aid"],
+      "verified": true
+    },
+    {
+      "name": "Oxfam",
+      "url": "https://www.oxfam.org/",
+      "description": "Global movement fighting inequality and poverty",
+      "phone": "+1-800-776-9326",
+      "regions": ["global"],
+      "focus": ["poverty", "inequality", "emergency response", "development"],
+      "verified": true
+    },
+    {
+      "name": "Save the Children",
+      "url": "https://www.savethechildren.org/",
+      "description": "Organization focused on children's rights and protection",
+      "phone": "+1-800-728-3843",
+      "regions": ["global"],
+      "focus": ["children", "education", "protection", "emergency response"],
+      "verified": true
+    },
+    {
+      "name": "CARE",
+      "url": "https://www.care.org/",
+      "description": "International humanitarian organization fighting global poverty",
+      "phone": "+1-800-521-CARE",
+      "regions": ["global"],
+      "focus": ["poverty", "gender equality", "emergency response", "development"],
+      "verified": true
+    },
+    {
+      "name": "International Rescue Committee",
+      "url": "https://www.rescue.org/",
+      "description": "Organization helping people affected by humanitarian crises",
+      "phone": "+1-855-9RESCUE",
+      "regions": ["global"],
+      "focus": ["refugees", "displacement", "emergency response", "resettlement"],
+      "verified": true
+    },
+    {
+      "name": "Médecins Sans Frontières",
+      "url": "https://www.msf.org/",
+      "description": "International medical humanitarian organization",
+      "phone": "+1-888-392-0392",
+      "regions": ["global"],
+      "focus": ["medical aid", "healthcare", "crisis response", "epidemics"],
+      "verified": true
+    },
+    {
+      "name": "World Vision",
+      "url": "https://www.worldvision.org/",
+      "description": "Christian humanitarian organization focused on children and families",
+      "phone": "+1-888-511-6548",
+      "regions": ["global"],
+      "focus": ["children", "development", "emergency response", "education"],
+      "verified": true
+    }
+  ]
+}
