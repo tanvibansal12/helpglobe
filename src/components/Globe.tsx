@@ -4,7 +4,17 @@ import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 
 // Dynamically import Globe to avoid SSR issues
-const Globe = dynamic(() => import('react-globe.gl'), { ssr: false });
+const Globe = dynamic(() => import('react-globe.gl'), { 
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-400 mx-auto mb-6"></div>
+        <div className="text-white text-xl font-medium">Loading Globe...</div>
+      </div>
+    </div>
+  )
+});
 
 interface Event {
   title: string;
@@ -26,9 +36,14 @@ interface GlobeProps {
 export default function GlobeComponent({ events, onEventClick }: GlobeProps) {
   const globeRef = useRef<any>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    if (globeRef.current) {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (globeRef.current && isMounted) {
       // Set initial camera position for cinematic view
       globeRef.current.pointOfView({ lat: 20, lng: 0, altitude: 2.5 });
       
@@ -36,7 +51,7 @@ export default function GlobeComponent({ events, onEventClick }: GlobeProps) {
       globeRef.current.controls().autoRotate = true;
       globeRef.current.controls().autoRotateSpeed = 0.5;
     }
-  }, []);
+  }, [isMounted]);
 
   // Get color based on event type with glow effects
   const getEventColor = (type: string) => {
@@ -75,10 +90,24 @@ export default function GlobeComponent({ events, onEventClick }: GlobeProps) {
     }
   };
 
+  // Don't render anything until mounted to prevent hydration mismatch
+  if (!isMounted) {
+    return (
+      <div className="w-full h-full relative globe-container">
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-400 mx-auto mb-6 animate-glow"></div>
+            <div className="text-white text-xl font-medium">Loading 3D Globe...</div>
+            <div className="text-gray-400 text-sm mt-2">Initializing...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full h-full relative globe-container">
-      {typeof window !== 'undefined' && (
-        <Globe
+      <Globe
           ref={globeRef}
           // High-quality Earth texture
           globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
@@ -126,7 +155,6 @@ export default function GlobeComponent({ events, onEventClick }: GlobeProps) {
             maxDistance: 5
           }}
         />
-      )}
       
       {!isLoaded && (
         <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900">
