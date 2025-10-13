@@ -17,6 +17,7 @@ const Globe = dynamic(() => import('react-globe.gl'), {
 });
 
 interface Event {
+  id: string;
   title: string;
   lat: number;
   lon: number;
@@ -26,6 +27,10 @@ interface Event {
   date: string;
   magnitude?: number;
   source: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  country?: string;
+  region?: string;
+  category: 'natural' | 'conflict' | 'health' | 'economic' | 'social' | 'environmental';
 }
 
 interface GlobeProps {
@@ -53,36 +58,61 @@ export default function GlobeComponent({ events, onEventClick }: GlobeProps) {
     }
   }, [isMounted]);
 
-  // Get color based on event type with glow effects
-  const getEventColor = (type: string) => {
-    switch (type) {
-      case 'conflict':
-        return '#ff4444'; // bright red
-      case 'disaster':
-        return '#4488ff'; // bright blue
-      case 'protest':
-        return '#ffdd44'; // bright yellow
-      case 'health':
-        return '#44ff88'; // bright green
-      case 'earthquake':
-        return '#ff8844'; // bright orange
+  // Get color based on event type and severity
+  const getEventColor = (type: string, severity: string) => {
+    const baseColors = {
+      'conflict': '#ff4444',    // red
+      'disaster': '#4488ff',    // blue
+      'protest': '#ffdd44',     // yellow
+      'health': '#44ff88',       // green
+      'earthquake': '#ff8844', // orange
+      'news': '#aa44ff'         // purple
+    };
+    
+    const color = baseColors[type as keyof typeof baseColors] || '#aa44ff';
+    
+    // Adjust brightness based on severity
+    switch (severity) {
+      case 'critical':
+        return color; // Full brightness
+      case 'high':
+        return color + 'cc'; // Slightly transparent
+      case 'medium':
+        return color + '99'; // More transparent
+      case 'low':
+        return color + '66'; // Most transparent
       default:
-        return '#aa44ff'; // bright purple
+        return color;
     }
   };
 
   // Prepare data for the globe with enhanced visuals
-  const globeData = events.map(event => ({
-    lat: event.lat,
-    lng: event.lon,
-    size: event.magnitude ? Math.max(0.8, event.magnitude / 8) : 0.8,
-    color: getEventColor(event.type),
-    event: event,
-    // Add glow effect
-    glow: true,
-    glowColor: getEventColor(event.type),
-    glowSize: event.magnitude ? Math.max(1.2, event.magnitude / 6) : 1.2
-  }));
+  const globeData = events.map(event => {
+    // Size based on severity and magnitude
+    let size = 0.5;
+    if (event.magnitude) {
+      size = Math.max(0.5, event.magnitude / 10);
+    } else {
+      switch (event.severity) {
+        case 'critical': size = 1.2; break;
+        case 'high': size = 1.0; break;
+        case 'medium': size = 0.8; break;
+        case 'low': size = 0.6; break;
+      }
+    }
+    
+    return {
+      lat: event.lat,
+      lng: event.lon,
+      size,
+      color: getEventColor(event.type, event.severity),
+      event: event,
+      // Add glow effect based on severity
+      glow: true,
+      glowColor: getEventColor(event.type, event.severity),
+      glowSize: size * 1.5
+    };
+  });
 
   const handlePointClick = (point: any) => {
     if (point.event) {

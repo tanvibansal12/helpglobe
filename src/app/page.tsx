@@ -5,6 +5,7 @@ import GlobeComponent from '@/components/Globe';
 import DetailPanel from '@/components/DetailPanel';
 
 interface Event {
+  id: string;
   title: string;
   lat: number;
   lon: number;
@@ -14,6 +15,10 @@ interface Event {
   date: string;
   magnitude?: number;
   source: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  country?: string;
+  region?: string;
+  category: 'natural' | 'conflict' | 'health' | 'economic' | 'social' | 'environmental';
 }
 
 export default function Home() {
@@ -79,15 +84,26 @@ export default function Home() {
     return `${diffInDays} days ago`;
   };
 
-  const getEventTypeStats = () => {
-    const stats = events.reduce((acc, event) => {
+  const getEventStats = () => {
+    const typeStats = events.reduce((acc, event) => {
       acc[event.type] = (acc[event.type] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
-    return stats;
+    
+    const severityStats = events.reduce((acc, event) => {
+      acc[event.severity] = (acc[event.severity] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    const sourceStats = events.reduce((acc, event) => {
+      acc[event.source] = (acc[event.source] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    return { typeStats, severityStats, sourceStats };
   };
 
-  const stats = getEventTypeStats();
+  const { typeStats, severityStats, sourceStats } = getEventStats();
 
   return (
     <div className="h-screen flex flex-col bg-gray-900 relative overflow-hidden">
@@ -124,31 +140,75 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Stats Panel */}
+      {/* Enhanced Stats Panel */}
       <div className="relative z-10 bg-gray-900/60 backdrop-blur-xl border-b border-gray-700/30 px-6 py-4">
-        <div className="flex items-center gap-8">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-            <span className="text-gray-300">Conflicts: {stats.conflict || 0}</span>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {/* Event Types */}
+          <div className="space-y-2">
+            <div className="text-xs text-gray-400 font-medium">Event Types</div>
+            <div className="flex flex-wrap gap-2">
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                <span className="text-xs text-gray-300">Conflicts: {typeStats.conflict || 0}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <span className="text-xs text-gray-300">Disasters: {typeStats.disaster || 0}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                <span className="text-xs text-gray-300">Earthquakes: {typeStats.earthquake || 0}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-xs text-gray-300">Health: {typeStats.health || 0}</span>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-            <span className="text-gray-300">Disasters: {stats.disaster || 0}</span>
+          
+          {/* Severity Levels */}
+          <div className="space-y-2">
+            <div className="text-xs text-gray-400 font-medium">Severity</div>
+            <div className="flex flex-wrap gap-2">
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                <span className="text-xs text-gray-300">Critical: {severityStats.critical || 0}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                <span className="text-xs text-gray-300">High: {severityStats.high || 0}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                <span className="text-xs text-gray-300">Medium: {severityStats.medium || 0}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                <span className="text-xs text-gray-300">Low: {severityStats.low || 0}</span>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-yellow-500 rounded-full animate-pulse"></div>
-            <span className="text-gray-300">Protests: {stats.protest || 0}</span>
+          
+          {/* Data Sources */}
+          <div className="space-y-2">
+            <div className="text-xs text-gray-400 font-medium">Data Sources</div>
+            <div className="flex flex-wrap gap-2">
+              {Object.entries(sourceStats).map(([source, count]) => (
+                <div key={source} className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                  <span className="text-xs text-gray-300">{source}: {count}</span>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-gray-300">Health: {stats.health || 0}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-orange-500 rounded-full animate-pulse"></div>
-            <span className="text-gray-300">Earthquakes: {stats.earthquake || 0}</span>
-          </div>
-          <div className="text-gray-400">
-            Total: {events.length} events
+          
+          {/* Total Stats */}
+          <div className="space-y-2">
+            <div className="text-xs text-gray-400 font-medium">Total Events</div>
+            <div className="text-lg font-bold text-white">{events.length}</div>
+            <div className="text-xs text-gray-400">
+              Last updated: {lastUpdated ? formatTimeAgo(lastUpdated) : 'Never'}
+            </div>
           </div>
         </div>
       </div>
