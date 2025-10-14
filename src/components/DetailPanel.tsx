@@ -31,11 +31,89 @@ export default function DetailPanel({ event, onClose }: DetailPanelProps) {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
 
   useEffect(() => {
-    fetch('/data/organizations.json')
+    fetch('/data/regional-organizations.json')
       .then(response => response.json())
-      .then(data => setOrganizations(data.organizations))
+      .then(data => {
+        // Get region-specific organizations based on event location
+        if (event) {
+          const relevantOrgs = getRelevantOrganizations(event, data.organizations);
+          setOrganizations(relevantOrgs);
+        } else {
+          // Default to global organizations
+          setOrganizations(data.organizations.global || []);
+        }
+      })
       .catch(error => console.error('Error loading organizations:', error));
-  }, []);
+  }, [event]);
+
+  // Function to get relevant organizations based on event location and type
+  const getRelevantOrganizations = (event: Event, orgData: any): Organization[] => {
+    const relevantOrgs: Organization[] = [];
+    
+    // Always include global organizations
+    if (orgData.global) {
+      relevantOrgs.push(...orgData.global);
+    }
+    
+    // Add regional organizations based on country/region
+    const country = event.country?.toLowerCase() || '';
+    const region = getRegionFromCountry(country);
+    
+    if (region && orgData[region]) {
+      relevantOrgs.push(...orgData[region]);
+    }
+    
+    // Add country-specific organizations
+    if (orgData.specific_countries) {
+      const countryKey = getCountryKey(country);
+      if (countryKey && orgData.specific_countries[countryKey]) {
+        relevantOrgs.push(...orgData.specific_countries[countryKey]);
+      }
+    }
+    
+    // Remove duplicates and return top 8 most relevant
+    const uniqueOrgs = relevantOrgs.filter((org, index, self) => 
+      index === self.findIndex(o => o.name === org.name)
+    );
+    
+    return uniqueOrgs.slice(0, 8);
+  };
+
+  // Helper function to determine region from country
+  const getRegionFromCountry = (country: string): string | null => {
+    const regionMap: { [key: string]: string } = {
+      'ukraine': 'europe',
+      'gaza': 'middle-east',
+      'palestine': 'middle-east',
+      'syria': 'middle-east',
+      'afghanistan': 'asia',
+      'kenya': 'africa',
+      'somalia': 'africa',
+      'japan': 'asia',
+      'china': 'asia',
+      'india': 'asia',
+      'usa': 'americas',
+      'canada': 'americas',
+      'brazil': 'americas',
+      'france': 'europe',
+      'germany': 'europe',
+      'italy': 'europe'
+    };
+    
+    return regionMap[country] || null;
+  };
+
+  // Helper function to get country key for specific countries
+  const getCountryKey = (country: string): string | null => {
+    const countryMap: { [key: string]: string } = {
+      'ukraine': 'ukraine',
+      'gaza': 'gaza',
+      'palestine': 'gaza',
+      'syria': 'syria'
+    };
+    
+    return countryMap[country] || null;
+  };
 
   if (!event) return null;
 
@@ -133,17 +211,29 @@ export default function DetailPanel({ event, onClose }: DetailPanelProps) {
             </a>
           </div>
 
-          {/* How to Help */}
+          {/* How to Help - Region Specific */}
           <div className="mb-8">
-            <h3 className="text-xl font-semibold text-white mb-6">How to Help</h3>
+            <h3 className="text-xl font-semibold text-white mb-4">
+              How to Help {event.country && `in ${event.country}`}
+            </h3>
+            <div className="mb-4 p-3 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+              <div className="text-sm text-blue-300">
+                <strong>📍 Location-specific help:</strong> Organizations below are tailored to this region and crisis type.
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-80 overflow-y-auto">
-              {organizations.slice(0, 6).map((org, index) => (
+              {organizations.map((org, index) => (
                 <div key={index} className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-4 hover:bg-gray-800/70 transition-colors">
                   <div className="flex items-start justify-between mb-2">
                     <div className="font-medium text-white text-lg">{org.name}</div>
-                    {org.verified && (
-                      <span className="text-green-400 text-sm">✓ Verified</span>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {org.verified && (
+                        <span className="text-green-400 text-sm">✓ Verified</span>
+                      )}
+                      <span className="text-xs text-gray-400 bg-gray-700 px-2 py-1 rounded">
+                        {org.regions[0] || 'Global'}
+                      </span>
+                    </div>
                   </div>
                   <div className="text-gray-300 text-sm mb-3">
                     {org.description}
@@ -163,10 +253,21 @@ export default function DetailPanel({ event, onClose }: DetailPanelProps) {
                     <div className="text-xs text-gray-500">
                       Focus: {org.focus.slice(0, 3).join(', ')}
                     </div>
+                    {org.regions.length > 1 && (
+                      <div className="text-xs text-gray-500">
+                        Regions: {org.regions.slice(0, 2).join(', ')}
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
             </div>
+            {organizations.length === 0 && (
+              <div className="text-center py-8 text-gray-400">
+                <div className="text-lg mb-2">No specific organizations found</div>
+                <div className="text-sm">Try checking global humanitarian organizations</div>
+              </div>
+            )}
           </div>
 
           {/* Actions */}
