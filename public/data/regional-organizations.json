@@ -1,0 +1,240 @@
+{
+  "organizations": {
+    "global": [
+      {
+        "name": "Red Cross",
+        "url": "https://www.redcross.org/",
+        "description": "International humanitarian organization providing emergency assistance",
+        "phone": "+1-800-RED-CROSS",
+        "regions": ["global"],
+        "focus": ["disaster relief", "emergency response", "healthcare"],
+        "verified": true
+      },
+      {
+        "name": "Doctors Without Borders",
+        "url": "https://www.doctorswithoutborders.org/",
+        "description": "Medical humanitarian organization providing healthcare in crisis zones",
+        "phone": "+1-888-392-0392",
+        "regions": ["global"],
+        "focus": ["healthcare", "medical aid", "crisis response"],
+        "verified": true
+      },
+      {
+        "name": "UNICEF",
+        "url": "https://www.unicef.org/",
+        "description": "United Nations agency focused on children's rights and welfare",
+        "phone": "+1-800-367-5437",
+        "regions": ["global"],
+        "focus": ["children", "education", "healthcare", "emergency response"],
+        "verified": true
+      }
+    ],
+    "africa": [
+      {
+        "name": "African Union",
+        "url": "https://au.int/",
+        "description": "Continental organization coordinating humanitarian response across Africa",
+        "phone": "+251-11-551-7700",
+        "regions": ["africa"],
+        "focus": ["conflict resolution", "humanitarian aid", "peacekeeping"],
+        "verified": true
+      },
+      {
+        "name": "African Development Bank",
+        "url": "https://www.afdb.org/",
+        "description": "Regional development bank providing emergency funding and support",
+        "phone": "+225-20-20-49-53",
+        "regions": ["africa"],
+        "focus": ["economic development", "emergency funding", "infrastructure"],
+        "verified": true
+      },
+      {
+        "name": "Kenya Red Cross",
+        "url": "https://www.redcross.or.ke/",
+        "description": "National Red Cross society providing emergency response in Kenya and East Africa",
+        "phone": "+254-20-395-0000",
+        "regions": ["kenya", "east-africa"],
+        "focus": ["disaster response", "healthcare", "emergency services"],
+        "verified": true
+      }
+    ],
+    "middle-east": [
+      {
+        "name": "UNRWA",
+        "url": "https://www.unrwa.org/",
+        "description": "UN Relief and Works Agency for Palestine Refugees",
+        "phone": "+972-2-589-0404",
+        "regions": ["palestine", "gaza", "west-bank"],
+        "focus": ["refugee assistance", "education", "healthcare", "emergency aid"],
+        "verified": true
+      },
+      {
+        "name": "Islamic Relief Worldwide",
+        "url": "https://www.islamic-relief.org/",
+        "description": "International humanitarian organization providing aid in Muslim-majority regions",
+        "phone": "+44-121-605-5555",
+        "regions": ["middle-east", "muslim-majority"],
+        "focus": ["emergency response", "healthcare", "food security", "education"],
+        "verified": true
+      },
+      {
+        "name": "Qatar Red Crescent",
+        "url": "https://www.qrcs.org.qa/",
+        "description": "Qatar's national humanitarian organization with regional reach",
+        "phone": "+974-4402-2222",
+        "regions": ["qatar", "gulf", "middle-east"],
+        "focus": ["disaster response", "healthcare", "emergency services"],
+        "verified": true
+      }
+    ],
+    "europe": [
+      {
+        "name": "European Union Civil Protection",
+        "url": "https://ec.europa.eu/echo/",
+        "description": "EU's emergency response coordination mechanism",
+        "phone": "+32-2-299-11-11",
+        "regions": ["europe", "eu"],
+        "focus": ["emergency coordination", "disaster response", "humanitarian aid"],
+        "verified": true
+      },
+      {
+        "name": "Caritas Europa",
+        "url": "https://www.caritas.eu/",
+        "description": "European network of Catholic charities providing humanitarian assistance",
+        "phone": "+32-2-235-26-00",
+        "regions": ["europe"],
+        "focus": ["social services", "emergency aid", "migration support"],
+        "verified": true
+      },
+      {
+        "name": "German Red Cross",
+        "url": "https://www.drk.de/",
+        "description": "Germany's national Red Cross society with international reach",
+        "phone": "+49-30-85404-0",
+        "regions": ["germany", "europe"],
+        "focus": ["disaster response", "healthcare", "emergency services"],
+        "verified": true
+      }
+    ],
+    "asia": [
+      {
+        "name": "ASEAN Coordinating Centre for Humanitarian Assistance",
+        "url": "https://www.ahacentre.org/",
+        "description": "ASEAN's regional disaster management and humanitarian assistance center",
+        "phone": "+60-3-2161-0120",
+        "regions": ["southeast-asia", "asean"],
+        "focus": ["disaster management", "emergency response", "regional coordination"],
+        "verified": true
+      },
+      {
+        "name": "Japan International Cooperation Agency",
+        "url": "https://www.jica.go.jp/",
+        "description": "Japan's international development and emergency assistance agency",
+        "phone": "+81-3-5226-6660",
+        "regions": ["japan", "asia"],
+        "focus": ["emergency assistance", "disaster response", "development aid"],
+        "verified": true
+      },
+      {
+        "name": "Indian Red Cross Society",
+        "url": "https://www.indianredcross.org/",
+        "description": "India's national Red Cross society providing emergency response",
+        "phone": "+91-11-2371-6441",
+        "regions": ["india", "south-asia"],
+        "focus": ["disaster response", "healthcare", "emergency services"],
+        "verified": true
+      }
+    ],
+    "americas": [
+      {
+        "name": "Organization of American States",
+        "url": "https://www.oas.org/",
+        "description": "Regional organization coordinating humanitarian response in the Americas",
+        "phone": "+1-202-370-5000",
+        "regions": ["americas", "latin-america"],
+        "focus": ["regional coordination", "humanitarian aid", "crisis response"],
+        "verified": true
+      },
+      {
+        "name": "American Red Cross",
+        "url": "https://www.redcross.org/",
+        "description": "United States Red Cross providing disaster response and emergency services",
+        "phone": "+1-800-RED-CROSS",
+        "regions": ["usa", "americas"],
+        "focus": ["disaster response", "emergency services", "healthcare"],
+        "verified": true
+      },
+      {
+        "name": "Canadian Red Cross",
+        "url": "https://www.redcross.ca/",
+        "description": "Canada's national Red Cross society with international humanitarian programs",
+        "phone": "+1-800-418-1111",
+        "regions": ["canada", "americas"],
+        "focus": ["disaster response", "emergency services", "international aid"],
+        "verified": true
+      }
+    ],
+    "specific-countries": {
+      "ukraine": [
+        {
+          "name": "Ukrainian Red Cross",
+          "url": "https://redcross.org.ua/",
+          "description": "Ukraine's national Red Cross society providing emergency response",
+          "phone": "+380-44-235-01-01",
+          "regions": ["ukraine"],
+          "focus": ["emergency response", "healthcare", "evacuation support"],
+          "verified": true
+        },
+        {
+          "name": "Razom for Ukraine",
+          "url": "https://razomforukraine.org/",
+          "description": "Ukrainian-American organization providing humanitarian aid to Ukraine",
+          "phone": "+1-646-657-8380",
+          "regions": ["ukraine"],
+          "focus": ["humanitarian aid", "medical supplies", "emergency response"],
+          "verified": true
+        }
+      ],
+      "gaza": [
+        {
+          "name": "Palestinian Red Crescent Society",
+          "url": "https://www.palestinercs.org/",
+          "description": "Palestine's national Red Crescent society providing emergency medical services",
+          "phone": "+970-2-240-6515",
+          "regions": ["palestine", "gaza"],
+          "focus": ["emergency medical services", "ambulance services", "healthcare"],
+          "verified": true
+        },
+        {
+          "name": "Medical Aid for Palestinians",
+          "url": "https://www.map.org.uk/",
+          "description": "UK-based organization providing medical aid to Palestinians",
+          "phone": "+44-20-7226-4114",
+          "regions": ["palestine", "gaza"],
+          "focus": ["medical aid", "healthcare", "emergency medical services"],
+          "verified": true
+        }
+      ],
+      "syria": [
+        {
+          "name": "Syrian Arab Red Crescent",
+          "url": "https://www.sarc.sy/",
+          "description": "Syria's national Red Crescent society providing humanitarian assistance",
+          "phone": "+963-11-331-9260",
+          "regions": ["syria"],
+          "focus": ["humanitarian aid", "healthcare", "emergency response"],
+          "verified": true
+        },
+        {
+          "name": "White Helmets",
+          "url": "https://www.whitehelmets.org/",
+          "description": "Syrian Civil Defense providing emergency response and rescue services",
+          "phone": "+90-342-211-1111",
+          "regions": ["syria"],
+          "focus": ["emergency rescue", "civil defense", "search and rescue"],
+          "verified": true
+        }
+      ]
+    }
+  }
+}
